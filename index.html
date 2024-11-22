@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="DSUK - dsuk.top"
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-web/style.css" />
+    <link rel="icon" type="image/x-icon" href="https://toolb.cn/favicon/https://pan.dsuk.top">
+    <title>神奇导航页</title>
+    <style>
+        :root {
+            /* 亮色模式 */
+            --bg-color-light: #ffffff;
+            --text-color-light: #2196f3;
+            --card-bg-light: #ffffff;
+            --card-shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --link-color-light: rgb(33 150 243 / 86%);
+            ;
+
+            /* 暗色模式 */
+            --bg-color-dark: #2b2b2b9c;
+            --text-color-light: #2196f3;
+            --card-bg-dark: #1e1e1e;
+            --card-shadow-dark: 0 4px 6px rgba(0, 0, 0, 0.2);
+            --link-color-dark: rgb(33 150 243 / 86%);
+            ;
+
+            color-scheme: light dark;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: "LXGW WenKai Screen";
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-color-light);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: var(--bg-color-dark);
+                color: var(--text-color-dark);
+            }
+
+            .page-title {
+                color: var(--text-color-dark);
+                background: linear-gradient(45deg, #4da6ff, #87CEFA);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                color: transparent;
+            }
+
+            .card {
+                /* background-color: var(--card-bg-dark) !important; */
+                box-shadow: var(--card-shadow-dark) !important;
+                border-color: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            .container {
+                background-color: rgba(0, 0, 0, 0) !important;
+                backdrop-filter: blur(2px);
+            }
+
+            .card-link {
+                color: var(--text-color-dark) !important;
+            }
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(45deg, #2196f3, #4da6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0) !important;
+            backdrop-filter: blur(2px);
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-gap: 1.5rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .card {
+            /* background-color: var(--card-bg-light); */
+            border-radius: 12px;
+            box-shadow: var(--card-shadow-light);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transform-style: preserve-3d;
+        }
+
+        .card .status-badge {
+            font-size: 0.8rem;
+            margin-left: 10px;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .card .status-badge.status-normal {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .card .status-badge.status-error {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .card .status-badge.status-checking {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .card-link {
+            display: block;
+            text-decoration: none;
+            color: var(--text-color-light);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-wrapper:focus-within {
+            transform: translateY(-10px) scale(1);
+        }
+
+        .card img {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            object-fit: contain;
+            filter: grayscale(20%) brightness(1.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.1);
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color-light);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .card-link span {
+            color: var(--link-color-light);
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+            font-family: "LXGW WenKai Screen";
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 767px) {
+            .card-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        /* 搜索框样式 */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+
+        .search-wrapper {
+            display: flex;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0) !important;
+            backdrop-filter: blur(2px);
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .search-wrapper:hover {
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .search-wrapper:focus-within {
+            border-color: #2196f3;
+            box-shadow: 0 6px 24px rgba(33, 150, 243, 0.15);
+        }
+
+        .search-input {
+            background-color: rgba(0, 0, 0, 0) !important;
+            backdrop-filter: blur(2px);
+            flex-grow: 1;
+            border: none;
+            padding: 15px 20px;
+            font-size: 16px;
+            outline: none;
+            transition: background-color 0.3s ease;
+            font-family: "LXGW WenKai Screen";
+            min-width: 0;
+            /* 防止输入框在flex布局中溢出 */
+        }
+
+        .search-input::placeholder {
+            color: #9e9e9e;
+            opacity: 0.8;
+        }
+
+        .search-engine-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            cursor: pointer;
+            background-color: transparent;
+            transition: all 0.3s ease;
+            border: none;
+            width: 48px;
+            flex-shrink: 0;
+            /* 防止按钮被压缩 */
+        }
+
+        .search-engine-toggle:hover {
+            background-color: rgba(33, 150, 243, 0.08);
+        }
+
+        .search-engine-toggle svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .search-engine-toggle:hover svg {
+            transform: scale(1.1);
+        }
+
+        .search-button {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 15px 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            font-family: "LXGW WenKai Screen";
+            flex-shrink: 0;
+            /* 防止按钮被压缩 */
+        }
+
+        .search-button:hover {
+            background-color: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        /* 深色模式 */
+        @media (prefers-color-scheme: dark) {
+            .search-wrapper {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .search-wrapper:hover {
+                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+            }
+
+            .search-wrapper:focus-within {
+                border-color: #2196f3;
+                box-shadow: 0 6px 24px rgba(33, 150, 243, 0.2);
+            }
+
+            .search-input {
+                background-color: rgba(0, 0, 0, 0) !important;
+                backdrop-filter: blur(2px);
+                background-color: #2c2c2c;
+                color: #ffffff;
+            }
+
+            .search-input::placeholder {
+                color: #888;
+            }
+
+            .search-engine-toggle {
+                background-color: transparent;
+            }
+
+            .search-engine-toggle:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+
+            .search-button {
+                background-color: #2196f3;
+            }
+
+            .search-button:hover {
+                background-color: #1976d2;
+            }
+        }
+
+        /* 移动端适配 */
+        @media screen and (max-width: 768px) {
+            .search-container {
+                padding: 0 12px;
+                margin-bottom: 1.5rem;
+            }
+
+            .search-wrapper {
+                border-radius: 10px;
+            }
+
+            .search-input {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+
+            .search-engine-toggle {
+                padding: 0 12px;
+                width: 40px;
+            }
+
+            .search-engine-toggle svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .search-button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        /* 超小屏幕适配 */
+        @media screen and (max-width: 480px) {
+            .search-container {
+                padding: 0 8px;
+                margin-bottom: 1rem;
+            }
+
+            .search-input {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .search-engine-toggle {
+                padding: 0 10px;
+                width: 36px;
+            }
+
+            .search-button {
+                padding: 10px 16px;
+                min-width: 70px;
+                /* 确保按钮有最小宽度 */
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+    <h1 class="page-title">神奇导航页</h1>
+    <div class="search-container">
+        <div class="search-wrapper">
+            <input type="text" class="search-input" placeholder="搜索...">
+            <div class="search-engine-toggle" id="engineToggle">
+                <span>必应</span>
+            </div>
+            <button class="search-button" id="searchButton">搜索</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card-grid" id="card-grid"></div>
+    </div>
+
+    <script>
+        // SVG 图标定义
+        const googleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`;
+        const bingIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">    <path fill="#008373" d="M4.76 1L9.4 3.45v12.39l6.62-3.81-3.07-1.44-1.88-3.93L16.9 8.07l1.88 3.93 1.88 3.93L9.4 22 4.76 19.55V1z"/></svg>`;
+
+        // 获取页面元素
+        const searchInput = document.querySelector('.search-input');
+        const engineToggle = document.getElementById('engineToggle');
+        const searchButton = document.getElementById('searchButton');
+
+        // 设置初始搜索引擎为 Bing
+        let currentEngine = 'bing';
+
+        // 设置按钮样式使图标居中
+        engineToggle.style.display = 'flex';
+        engineToggle.style.alignItems = 'center';
+        engineToggle.style.justifyContent = 'center';
+
+        // 设置初始图标
+        engineToggle.querySelector('span').innerHTML = bingIcon;
+
+        // 执行搜索功能
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            // 搜索链接
+            const searchUrls = {
+                google: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+                bing: `https://www.bing.com/search?q=${encodeURIComponent(query)}`
+            };
+
+            // 使用 window.open 在新标签页打开
+            window.open(searchUrls[currentEngine], '_blank');
+        };
+
+        // 事件监听器
+        window.addEventListener('load', () => {
+            searchInput.focus();
+        });
+        // 切换搜索引擎
+        engineToggle.addEventListener('click', () => {
+            if (currentEngine === 'google') {
+                currentEngine = 'bing';
+                engineToggle.querySelector('span').innerHTML = bingIcon;
+            } else {
+                currentEngine = 'google';
+                engineToggle.querySelector('span').innerHTML = googleIcon;
+            }
+        });
+
+        searchButton.addEventListener('click', performSearch);
+
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // 导航链接数据
+        const navigateLinks = [{
+            title: '哪吒面板',
+            url: 'https://x.dsuk.top',
+            icon: `https://toolb.cn/favicon/https://x.dsuk.top`
+        },
+        {
+            title: 'HomeLab',
+            url: 'https://dsuk.me',
+            icon: `https://toolb.cn/favicon/https://dsuk.me`
+        },
+        {
+            title: '博客',
+            url: 'https://dsuk.top',
+            icon: `https://toolb.cn/favicon/https://dsuk.top`
+        },
+        {
+            title: '网盘',
+            url: 'https://pan.dsuk.top',
+            icon: `https://toolb.cn/favicon/https://pan.dsuk.top`
+        },
+        {
+            title: 'Alist',
+            url: 'https://salen.eu.org',
+            icon: `https://toolb.cn/favicon/https://salen.eu.org`
+        },
+        {
+            title: '2FA',
+            url: 'https://auth.dsuk.top',
+            icon: `https://docs.2fauth.app/static/2fauth_dark.png`
+        },
+        {
+            title: '音乐',
+            url: 'https://music.dsuk.top',
+            icon: `https://toolb.cn/favicon/https://music.dsuk.top`
+        },
+        {
+            title: '导航',
+            url: 'https://nav.dsuk.top',
+            icon: `https://toolb.cn/favicon/https://nav.dsuk.top`
+        },
+        {
+            title: 'linux.do',
+            url: 'https://linux.do',
+            icon: `https://toolb.cn/favicon/https://linux.do`
+        },
+        {
+            title: '青龙面板',
+            url: 'https://qlbj.dsuk.top',
+            icon: `https://toolb.cn/favicon/https://qlbj.dsuk.top`
+        }
+        ];
+        // 初始化卡片
+        function createCard(link) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+		                        <a href="${link.url}" target="_blank" class="card-link">
+		                            <img src="${link.icon}" alt="${link.title}">
+		                            <h3>${link.title}<span class="status-badge status-checking">检测中</span></h3>
+		                            <span>${link.url}</span>
+		                        </a>
+		                    `;
+            return card;
+        }
+        // 检查URL状态
+        function checkUrl(url) {
+            const startTime = performance.now();
+            return new Promise((resolve) => {
+                fetch(url, {
+                    mode: 'no-cors',
+                    method: 'GET',
+                    timeout: 5000
+                })
+                    .then(() => {
+                        const endTime = performance.now();
+                        const duration = Math.round(endTime - startTime);
+                        resolve({
+                            isAccessible: true,
+                            duration
+                        });
+                    })
+                    .catch(() => resolve({
+                        isAccessible: false,
+                        duration: null
+                    }));
+            });
+        }
+        // 更新URL状态
+        function updateUrlStatus(card, isAccessible, duration) {
+            const statusBadge = card.querySelector('.status-badge');
+            if (isAccessible) {
+                statusBadge.textContent = `${duration} ms`;
+                statusBadge.className = 'status-badge status-normal';
+            } else {
+                statusBadge.textContent = '失联';
+                statusBadge.className = 'status-badge status-error';
+            }
+        }
+
+        async function initializeCards() {
+            const cardGrid = document.getElementById('card-grid');
+            cardGrid.innerHTML = ''; // 清空现有卡片
+
+            // 创建并添加所有卡片
+            const cardPromises = navigateLinks.map(async (link) => {
+                const card = createCard(link);
+                cardGrid.appendChild(card);
+
+                // 检查URL状态
+                const result = await checkUrl(link.url);
+                updateUrlStatus(card, result.isAccessible, result.duration);
+            });
+
+            // 等待所有卡片和状态检查完成
+            await Promise.all(cardPromises);
+
+            // 显示网格
+            cardGrid.style.opacity = '1';
+        }
+
+        // 初始化和定期检查
+        initializeCards();
+        setInterval(initializeCards, 1 * 5 * 1000);
+
+        // 全局配置对象
+        const CONFIG = {
+            loadDelay: 500,
+            particles: {
+                count: 230,
+                opacity: 0.55,
+                zIndex: -1,
+                size: 1,
+                speed: 0.5,
+                connectionDistance: 10000,
+                attractionForce: 0.07,
+                attractionDistance: 100,
+                collisionDistance: 10,
+                minMouseDistance: 20,
+                randomness: 0.3,
+            },
+            mouse: {
+                attractionDelay: 1500,
+                maxDistance: 40000,
+            },
+            colors: {
+                r: null,
+                g: null,
+                b: null,
+            }
+        };
+
+        // 粒子系统类
+        class ParticleSystem {
+            constructor(options = {}) {
+                this.canvas = document.createElement("canvas");
+                this.ctx = this.canvas.getContext("2d");
+                this.particles = [];
+
+                this.mouse = {
+                    x: null,
+                    y: null,
+                    max: CONFIG.mouse.maxDistance,
+                };
+
+                this.options = {
+                    ...CONFIG.particles,
+                    ...options,
+                };
+                this.mouseStationaryTime = 0;
+
+                this.lastMousePosition = {
+                    x: null,
+                    y: null,
+                };
+                this.isAttracting = false;
+                this.initCanvas();
+                this.calculateParticleCount();
+                this.initParticles();
+                this.bindEvents();
+                this.animate();
+            }
+
+            // 获取随机颜色
+            getRandomColor() {
+                const getColorComponent = (range) => {
+                    if (Array.isArray(range)) {
+                        return (
+                            Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0]
+                        );
+                    }
+
+                    return Math.floor(Math.random() * 256);
+                };
+
+                return {
+                    r: getColorComponent(CONFIG.colors.r),
+                    g: getColorComponent(CONFIG.colors.g),
+                    b: getColorComponent(CONFIG.colors.b),
+                };
+            }
+
+            // 初始化画布
+            initCanvas() {
+                this.canvas.id = "particleCanvas";
+                this.canvas.style.cssText = `
+		                    position: fixed;
+		                    top: 0;
+		                    left: 0;
+		                    z-index:${this.options.zIndex};
+		                    opacity:${this.options.opacity};
+		                    `;
+                document.body.appendChild(this.canvas);
+                this.resize();
+            }
+
+            // 计算粒子数量
+            calculateParticleCount() {
+                const screenArea = window.innerWidth * window.innerHeight;
+                const baseDensity = this.options.count / (1920 * 1080);
+                this.options.count = Math.floor(screenArea * baseDensity);
+                this.options.count = Math.max(20, Math.min(this.options.count, 200));
+            }
+
+            // 调整画布大小
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.calculateParticleCount();
+                this.initParticles();
+            }
+
+            // 初始化粒子
+            initParticles() {
+                this.particles = [];
+
+                for (let i = 0; i < this.options.count; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        xa: (2 * Math.random() - 1) * this.options.speed,
+                        ya: (2 * Math.random() - 1) * this.options.speed,
+                        max: this.options.connectionDistance,
+                        color: this.getRandomColor(),
+                    });
+                }
+            }
+
+            // 绑定事件
+            bindEvents() {
+                window.addEventListener("resize", () => this.resize());
+
+                window.addEventListener("mousemove", (e) => {
+                    if (this.mouse.x !== e.clientX || this.mouse.y !== e.clientY) {
+                        this.mouse.x = e.clientX;
+                        this.mouse.y = e.clientY;
+
+                        this.lastMousePosition = {
+                            x: e.clientX,
+                            y: e.clientY,
+                        };
+                        this.mouseStationaryTime = 0;
+                        this.isAttracting = true;
+                    }
+                });
+
+                window.addEventListener("mouseout", () => {
+                    this.mouse.x = null;
+                    this.mouse.y = null;
+                    this.isAttracting = false;
+                });
+            }
+
+            // 混合颜色
+            mixColors(color1, color2, weight) {
+                return {
+                    r: Math.floor(color1.r * weight + color2.r * (1 - weight)),
+                    g: Math.floor(color1.g * weight + color2.g * (1 - weight)),
+                    b: Math.floor(color1.b * weight + color2.b * (1 - weight)),
+                };
+            }
+
+            // 绘制粒子
+            drawParticles() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                const points = [...this.particles, this.mouse];
+
+                // 检查鼠标是否静止
+                if (this.mouse.x !== null && this.mouse.y !== null) {
+                    if (
+                        this.mouse.x === this.lastMousePosition.x &&
+                        this.mouse.y === this.lastMousePosition.y
+                    ) {
+                        this.mouseStationaryTime += 16;
+
+                        if (this.mouseStationaryTime >= CONFIG.mouse.attractionDelay) {
+                            this.isAttracting = false;
+                        }
+                    } else {
+                        this.mouseStationaryTime = 0;
+
+                        this.lastMousePosition = {
+                            x: this.mouse.x,
+                            y: this.mouse.y,
+                        };
+                        this.isAttracting = true;
+                    }
+                }
+
+                // 更新和绘制每个粒子
+                points.forEach((point, i) => {
+                    if (point === this.mouse) return;
+                    let newX = point.x + point.xa;
+                    let newY = point.y + point.ya;
+                    // 碰撞检测
+                    let collision = false;
+
+                    for (let j = 0; j < points.length; j++) {
+                        if (i !== j) {
+                            const otherPoint = points[j];
+                            const dx = newX - otherPoint.x;
+                            const dy = newY - otherPoint.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+
+                            if (distance < this.options.collisionDistance) {
+                                collision = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 处理碰撞或移动
+                    if (collision) {
+                        point.xa = -point.xa;
+                        point.ya = -point.ya;
+                    } else {
+                        point.x = newX;
+                        point.y = newY;
+                    }
+
+                    // 边界检查
+                    point.xa *= point.x > this.canvas.width || point.x < 0 ? -1 : 1;
+                    point.ya *= point.y > this.canvas.height || point.y < 0 ? -1 : 1;
+
+                    // 鼠标吸引效果
+                    if (
+                        this.isAttracting &&
+                        this.mouse.x !== null &&
+                        this.mouse.y !== null
+                    ) {
+                        const dx = this.mouse.x - point.x;
+                        const dy = this.mouse.y - point.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (
+                            dist < this.options.attractionDistance &&
+                            dist > this.options.minMouseDistance
+                        ) {
+                            const targetDist = Math.max(
+                                this.options.minMouseDistance,
+                                dist * (1 - this.options.attractionForce)
+                            );
+                            const targetX = this.mouse.x - (dx / dist) * targetDist;
+                            const targetY = this.mouse.y - (dy / dist) * targetDist;
+                            const randomAngle = Math.random() * Math.PI * 2;
+                            const randomDist =
+                                Math.random() *
+                                this.options.randomness *
+                                this.options.minMouseDistance;
+                            const randomX = Math.cos(randomAngle) * randomDist;
+                            const randomY = Math.sin(randomAngle) * randomDist;
+                            point.x +=
+                                (targetX - point.x + randomX) * this.options.attractionForce;
+                            point.y +=
+                                (targetY - point.y + randomY) * this.options.attractionForce;
+                        }
+                    }
+
+                    // 绘制粒子
+                    this.ctx.fillStyle = `rgb(${point.color.r}, ${point.color.g}, ${point.color.b})`;
+                    this.ctx.fillRect(
+                        point.x - this.options.size / 2,
+                        point.y - this.options.size / 2,
+                        this.options.size,
+                        this.options.size
+                    );
+
+                    // 绘制连接线
+                    points.forEach((p2, j) => {
+                        if (i === j) return;
+                        const dx = point.x - p2.x;
+                        const dy = point.y - p2.y;
+                        const dist = dx * dx + dy * dy;
+
+                        if (dist < point.max) {
+                            const ratio = (point.max - dist) / point.max;
+                            const mixedColor = this.mixColors(
+                                point.color,
+                                p2.color || point.color,
+                                ratio
+                            );
+                            this.ctx.beginPath();
+                            this.ctx.lineWidth = ratio / 2;
+                            this.ctx.strokeStyle = `rgba(${mixedColor.r}, ${mixedColor.g}, ${mixedColor.b}, ${ratio + 0.2})`;
+                            this.ctx.moveTo(point.x, point.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.stroke();
+                        }
+                    });
+                });
+            }
+
+            // 动画循环
+            animate() {
+                this.drawParticles();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                const particleSystem = new ParticleSystem();
+                particleSystem.canvas.classList.add("loaded");
+            }, CONFIG.loadDelay);
+        });
+    </script>
+</body>
+
+</html>
